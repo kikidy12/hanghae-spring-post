@@ -16,6 +16,7 @@
 
 5. API 명세서 작성 가이드라인을 검색하여 직접 작성한 API 명세서와 비교해보세요!
 - 구성을 맞추려고 노력했습니다.
+- api swagger router : /api-docs
 
 |URL           |Method|Request|Response|
 |--------------|------|-------|--------|
