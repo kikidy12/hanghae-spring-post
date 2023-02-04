@@ -1,8 +1,6 @@
 package com.example.board.service;
 
-import com.example.board.dto.AddPostDto;
 import com.example.board.dto.PostDto;
-import com.example.board.dto.UpdatePostDto;
 import com.example.board.entity.Post;
 import com.example.board.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +20,20 @@ public class PostService {
         this.repository = repository;
     }
 
-    public List<PostDto> findPosts() {
+    public List<PostDto.Res> findPosts() {
         return repository.findAll().stream().map(v ->
-                new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor())).toList();
+                new PostDto.Res(v.getId(), v.getTitle(), v.getContent(), v.getAuthor())).toList();
     }
 
-    public Optional<PostDto> findPost(Long id) {
+    public Optional<PostDto.Res> findPost(Long id) {
         return this.findPostHasPassword(id).map(v ->
-                new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
+                new PostDto.Res(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
     }
     public Optional<Post> findPostHasPassword(Long id) {
         return repository.findById(id);
     }
 
-    public PostDto addPost(AddPostDto dto) {
+    public PostDto.Res addPost(PostDto.Add dto) {
         Post post = new Post();
         post.setTitle(dto.getTitle());
         post.setAuthor(dto.getAuthor());
@@ -43,16 +41,16 @@ public class PostService {
         post.setPassword(dto.getPassword());
 
         post = repository.save(post);
-        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor());
+        return new PostDto.Res(post.getId(), post.getTitle(), post.getContent(), post.getAuthor());
     }
 
-    public Optional<PostDto> updatePost(UpdatePostDto post, Long id) {
+    public Optional<PostDto.Res> updatePost(PostDto.Update post, Long id) {
         Optional<Post> findPost = this.findPostHasPassword(id);
         if (findPost.isEmpty() || !findPost.get().getPassword().equals(post.getPassword())) {
             return Optional.empty();
         }
 
-        return findPost.map(v -> new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
+        return findPost.map(v -> new PostDto.Res(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
     }
 
 

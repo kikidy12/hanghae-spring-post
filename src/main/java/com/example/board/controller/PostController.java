@@ -25,26 +25,26 @@ public class PostController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<ResponseDto<List<PostDto>>> list() {
+    public ResponseEntity<ResponseDto<List<PostDto.Res>>> list() {
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "조회 성공", service.findPosts()));
     }
 
     @GetMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<ResponseDto<Optional<PostDto>>> one(@PathVariable("id") Long id) {
+    public ResponseEntity<ResponseDto<Optional<PostDto.Res>>> one(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "조회 성공", service.findPost(id)));
     }
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<ResponseDto<PostDto>> addPost(@RequestBody AddPostDto dto) {
+    public ResponseEntity<ResponseDto<PostDto.Res>> addPost(@RequestBody PostDto.Add dto) {
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "등록 성공",service.addPost(dto)));
     }
 
     @PutMapping("/{id}")
     @ResponseBody
-    public ResponseEntity<ResponseDto<PostDto>> updatePost(@PathVariable("id") Long id, @RequestBody UpdatePostDto dto) {
-        Optional<PostDto> result = service.updatePost(dto ,id);
+    public ResponseEntity<ResponseDto<PostDto.Res>> updatePost(@PathVariable("id") Long id, @RequestBody PostDto.Update dto) {
+        Optional<PostDto.Res> result = service.updatePost(dto ,id);
 
         return result.map(postDto ->
                 ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "수정 성공", postDto))).orElseGet(() ->
