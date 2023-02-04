@@ -1,17 +1,25 @@
 package com.example.board.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import org.springframework.http.HttpStatus;
 
 @Getter
+@Builder
 @AllArgsConstructor
-public class ResponseDto {
-    private final Boolean success;
-    private final String message;
+public class ResponseDto<T> {
+    private Integer code;
+    private String message;
+    private T data;
 
-    public static ResponseDto of(Boolean success, String message) {
-        return new ResponseDto(success, message);
+    public static<T> ResponseDto<T> res(final HttpStatus code, final String message) {
+        return res(code, message, null);
+    }
+
+    public static<T> ResponseDto<T> res(final HttpStatus code, final String message, final T data) {
+        return ResponseDto.<T>builder()
+                .data(data)
+                .code(code.value())
+                .message(message)
+                .build();
     }
 }
