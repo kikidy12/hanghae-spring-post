@@ -1,5 +1,8 @@
 package com.example.board.service;
 
+import com.example.board.dto.AddPostDto;
+import com.example.board.dto.PostDto;
+import com.example.board.dto.UpdatePostDto;
 import com.example.board.entity.Post;
 import com.example.board.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,34 +22,42 @@ public class PostService {
         this.repository = repository;
     }
 
-    public List<Post> findPosts() {
-        return repository.findAll();
+    public List<PostDto> findPosts() {
+        return repository.findAll().stream().map(v ->
+                new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor())).toList();
     }
 
-    public Optional<Post> findPost(Long id) {
+    public Optional<PostDto> findPost(Long id) {
+        return this.findPostHasPassword(id).map(v ->
+                new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
+    }
+    public Optional<Post> findPostHasPassword(Long id) {
         return repository.findById(id);
     }
 
-    public Post addPost(Post post) {
-        return repository.save(post);
+    public PostDto addPost(AddPostDto dto) {
+        Post post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setAuthor(dto.getAuthor());
+        post.setContent(dto.getContent());
+        post.setPassword(dto.getPassword());
+
+        post = repository.save(post);
+        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor());
     }
 
-    public Optional<Post> updatePost(Post post, Long id) {
-        Optional<Post> findPost = this.findPost(id);
+    public Optional<PostDto> updatePost(UpdatePostDto post, Long id) {
+        Optional<Post> findPost = this.findPostHasPassword(id);
         if (findPost.isEmpty() || !findPost.get().getPassword().equals(post.getPassword())) {
             return Optional.empty();
         }
 
-        findPost.get().setTitle(post.getTitle());
-        findPost.get().setContent(post.getContent());
-        findPost.get().setAuthor(post.getAuthor());
-
-        return Optional.of(repository.save(findPost.get()));
+        return findPost.map(v -> new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
     }
 
 
     public Boolean deletePost(Long id, String password) {
-        Optional<Post> post = this.findPost(id);
+        Optional<Post> post = this.findPostHasPassword(id);
         if (post.isEmpty() || !post.get().getPassword().equals(password)) {
             return false;
         }

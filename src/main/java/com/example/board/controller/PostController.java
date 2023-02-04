@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,54 +35,31 @@ public class PostController {
     @GetMapping
     @ResponseBody
     public ResponseDto list() {
-        List<PostDto> list = service.findPosts().stream().map(v ->
-                new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor())).toList();
-        return new DataResponseDto<>(true, "조회 성공", list);
+        return new DataResponseDto<>(true, "조회 성공", service.findPosts());
     }
 
     @GetMapping("/{id}")
     @ResponseBody
     public ResponseDto one(@PathVariable("id") Long id) {
-        Optional<Post> post = service.findPost(id);
-        Optional<PostDto> data = post.map(v ->
-                new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
-        return new DataResponseDto<>(true, "조회 성공", data);
+        return new DataResponseDto<>(true, "조회 성공", service.findPost(id));
     }
 
     @PostMapping
     @ResponseBody
     public ResponseDto addPost(@RequestBody AddPostDto dto) {
-        Post post = new Post();
-        post.setTitle(dto.getTitle());
-        post.setAuthor(dto.getAuthor());
-        post.setContent(dto.getContent());
-        post.setPassword(dto.getPassword());
-
-        Post res = service.addPost(post);
-        PostDto data = new PostDto(res.getId(), res.getTitle(), res.getContent(), res.getAuthor());
-
-        return new DataResponseDto<>(true, "등록 성공", data);
+        return new DataResponseDto<>(true, "등록 성공", service.addPost(dto));
     }
 
     @PutMapping("/{id}")
     @ResponseBody
     public ResponseDto updatePost(@PathVariable("id") Long id, @RequestBody UpdatePostDto dto) {
-        Post post = new Post();
-        post.setTitle(dto.getTitle());
-        post.setAuthor(dto.getAuthor());
-        post.setContent(dto.getContent());
-        post.setPassword(dto.getPassword());
-
-        Optional<Post> result = service.updatePost(post ,id);
+        Optional<PostDto> result = service.updatePost(dto ,id);
 
         if (result.isEmpty()) {
             return ResponseDto.of(false, "수정 실패");
         }
 
-        Optional<PostDto> data = result.map(v ->
-                new PostDto(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
-
-        return new DataResponseDto<>(true, "수정 성공", data);
+        return new DataResponseDto<>(true, "수정 성공", result);
     }
 
     @DeleteMapping("/{id}")
@@ -93,6 +71,5 @@ public class PostController {
         else {
             return ResponseDto.of(false, "삭제 실패");
         }
-
     }
 }
