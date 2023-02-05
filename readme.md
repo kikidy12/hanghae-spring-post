@@ -1,6 +1,8 @@
 # hanghae-spring-post
 항해 포스트 crud과제
 
+![제목 없는 다이어그램.drawio-3.png](..%2F..%2F..%2F..%2F..%2F..%2FDownloads%2F%EC%A0%9C%EB%AA%A9%20%EC%97%86%EB%8A%94%20%EB%8B%A4%EC%9D%B4%EC%96%B4%EA%B7%B8%EB%9E%A8.drawio-3.png)
+
 1. 수정, 삭제 API의 request를 어떤 방식으로 사용하셨나요? (param, query, body)
 - 수정의 경우 PUT을 사용했고 id를 path로 나머지 데이터는 body로 처리했습니다.
 - 삭제는 delete를 사용하였고 path에 id query password로 처리했습니다.
