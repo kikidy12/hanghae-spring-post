@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     public Boolean deleteByIdAndPassword(Long id, String password);
+    public Optional<Post> findByIdAndPassword(Long id, String password);
 }

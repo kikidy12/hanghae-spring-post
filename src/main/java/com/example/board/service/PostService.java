@@ -5,7 +5,9 @@ import com.example.board.entity.Post;
 import com.example.board.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,46 +22,45 @@ public class PostService {
         this.repository = repository;
     }
 
-    public List<PostDto.Res> findPosts() {
+    public List<PostDto.PostRes> findPosts() {
         return repository.findAll().stream().map(v ->
-                new PostDto.Res(v.getId(), v.getTitle(), v.getContent(), v.getAuthor())).toList();
+                new PostDto.PostRes(v.getId(), v.getTitle(), v.getContent(), v.getAuthor())).toList();
     }
 
-    public Optional<PostDto.Res> findPost(Long id) {
-        return this.findPostHasPassword(id).map(v ->
-                new PostDto.Res(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
+    public PostDto.PostRes findPost(Long id) {
+        Post post = this.repository.findById(id).orElseThrow();
+        return new PostDto.PostRes(post);
     }
-    public Optional<Post> findPostHasPassword(Long id) {
-        return repository.findById(id);
+    public Post findPostHasPassword(Long id, String password) {
+        return repository.findByIdAndPassword(id, password).orElseThrow();
     }
 
-    public PostDto.Res addPost(PostDto.Add dto) {
+    @Transactional
+    public PostDto.PostRes addPost(PostDto.PostAdd dto) {
         Post post = new Post();
         post.setTitle(dto.getTitle());
         post.setAuthor(dto.getAuthor());
         post.setContent(dto.getContent());
         post.setPassword(dto.getPassword());
 
-        post = repository.save(post);
-        return new PostDto.Res(post.getId(), post.getTitle(), post.getContent(), post.getAuthor());
+        return new PostDto.PostRes(repository.save(post));
     }
 
-    public Optional<PostDto.Res> updatePost(PostDto.Update post, Long id) {
-        Optional<Post> findPost = this.findPostHasPassword(id);
-        if (findPost.isEmpty() || !findPost.get().getPassword().equals(post.getPassword())) {
-            return Optional.empty();
-        }
+    @Transactional
+    public PostDto.PostRes updatePost(PostDto.PostUpdate dto, Long id) {
+        Post post = this.findPostHasPassword(id, dto.getPassword());
 
-        return findPost.map(v -> new PostDto.Res(v.getId(), v.getTitle(), v.getContent(), v.getAuthor()));
+        post.setAuthor(dto.getAuthor());
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+
+        return new PostDto.PostRes(post);
     }
 
 
-    public Boolean deletePost(Long id, String password) {
-        Optional<Post> post = this.findPostHasPassword(id);
-        if (post.isEmpty() || !post.get().getPassword().equals(password)) {
-            return false;
-        }
-        repository.deleteById(id);
-        return true;
+    @Transactional
+    public void deletePost(Long id, String password) {
+        Post post = this.repository.findByIdAndPassword(id, password).orElseThrow();
+        this.repository.deleteById(post.getId());
     }
 }
