@@ -37,11 +37,7 @@ public class PostService {
 
     @Transactional
     public PostDto.PostRes addPost(PostDto.PostAdd dto) {
-        Post post = new Post();
-        post.setTitle(dto.getTitle());
-        post.setAuthor(dto.getAuthor());
-        post.setContent(dto.getContent());
-        post.setPassword(dto.getPassword());
+        Post post = Post.builder().dto(dto).build();
 
         return new PostDto.PostRes(repository.save(post));
     }
@@ -49,11 +45,7 @@ public class PostService {
     @Transactional
     public PostDto.PostRes updatePost(PostDto.PostUpdate dto, Long id) {
         Post post = this.findPostHasPassword(id, dto.getPassword());
-
-        post.setAuthor(dto.getAuthor());
-        post.setTitle(dto.getTitle());
-        post.setContent(dto.getContent());
-
+        post.update(dto);
         return new PostDto.PostRes(post);
     }
 

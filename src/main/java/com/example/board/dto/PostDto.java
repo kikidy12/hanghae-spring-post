@@ -4,12 +4,13 @@ import com.example.board.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
+import java.util.Optional;
 
 @Getter
-@AllArgsConstructor
 public class PostDto {
 
     @Getter
@@ -44,6 +45,7 @@ public class PostDto {
     }
 
     @Getter
+    @ToString
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PostUpdate {
